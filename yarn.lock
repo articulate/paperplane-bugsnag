@@ -8,6 +8,10 @@
   dependencies:
     ramda "^0.25.0"
 
+"@articulate/spy@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@articulate/spy/-/spy-0.0.1.tgz#2da9fdb919075fa5fc3868017e17b43b8528a399"
+
 "@babel/code-frame@7.0.0-beta.51":
   version "7.0.0-beta.51"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.0.0-beta.51.tgz#bd71d9b192af978df915829d39d4094456439a0c"

@@ -23,11 +23,8 @@ const formatRequest = req => ({
 const isJoi =
   prop('isJoi')
 
-const notProd = () =>
-  process.env.NODE_ENV !== 'production'
-
 const notifiable =
-  flip(complement(anyPass([ clientError, isJoi, notProd ])))
+  flip(complement(anyPass([ clientError, isJoi ])))
 
 const redacted =
   always('REDACTED')

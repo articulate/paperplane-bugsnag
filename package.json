@@ -25,6 +25,7 @@
     "ramda": "^0.25.0"
   },
   "devDependencies": {
+    "@articulate/spy": "^0.0.1",
     "chai": "^4.1.2",
     "coveralls": "^3.0.2",
     "eslint": "^5.4.0",
