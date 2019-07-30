@@ -2,7 +2,7 @@ const { logger } = require('paperplane')
 
 const {
   always, anyPass, complement, compose, evolve, flip, gt,
-  is, pathSatisfies, prop, tap, when
+  is, merge, pathSatisfies, prop, tap, when
 } = require('ramda')
 
 const addRequest = (notification, { req }) => {
@@ -32,14 +32,29 @@ const redacted =
 const redactHeaders =
   evolve({ authorization: redacted, cookie: redacted })
 
-const setup = bugsnag => {
-  bugsnag.onBeforeNotify(notifiable)
-  bugsnag.onBeforeNotify(addRequest)
+const setup = (bugsnag, opts) => {
+  const bugsnagClient = bugsnag(merge({
+    beforeSend: report => {
+      if (!notifiable(report)) {
+        report.ignore()
+      }
 
-  bugsnag.notify =
-    when(is(Error), compose(bugsnag.notify, tap(logger)))
+      // somehow add the request, if present
+      console.log({ report, addR: addRequest(report) })
 
-  return bugsnag
+      // check if report is an Error, if so pass to logger
+      // bugsnag.notify =
+      //   when(is(Error), compose(bugsnag.notify, tap(logger)))
+      if (is(Error, report)) {
+        logger(report)
+      }
+
+      return report
+    }
+  }, opts))
+
+
+  return bugsnagClient
 }
 
 module.exports = setup

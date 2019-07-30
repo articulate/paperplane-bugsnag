@@ -41,6 +41,6 @@
     "nyc": "^13.0.1"
   },
   "peerDependencies": {
-    "bugsnag": "2.x"
+    "@bugsnag/js": "6.x"
   }
 }
