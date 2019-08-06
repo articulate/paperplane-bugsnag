@@ -2,40 +2,24 @@ const Boom = require('boom')
 const { expect } = require('chai')
 const spy = require('@articulate/spy')
 
-const logger = require('paperplane').logger = spy()
-
+const mockLogger = require('paperplane').logger = spy()
 const setup = require('.')
-
-const FakeBugsnag = notified => {
-  const befores = []
-
-  const onBeforeNotify = befores.push.bind(befores)
-
-  const notify = err => {
-    const notification = { events: [{ metaData: {} }] }
-    let dontNotify
-    befores.forEach(cb => {
-      const ret = cb(notification, err)
-      if (ret === false) dontNotify = true
-    })
-    if (!dontNotify) notified(notification)
-  }
-
-  return { onBeforeNotify, notify }
-}
 
 describe('paperplane-bugsnag + bugsnag.notify', () => {
   let bugsnag
-  const notified = spy()
+  const mockNotify = spy()
+
+  const mockBugsnagClient = {
+    notify: mockNotify,
+  }
 
   beforeEach(() => {
-    bugsnag = FakeBugsnag(notified)
-    setup(bugsnag)
+    bugsnag = setup(mockBugsnagClient)
   })
 
   afterEach(() => {
-    logger.reset()
-    notified.reset()
+    mockLogger.reset()
+    mockNotify.reset()
   })
 
   describe('when no Error', () => {
@@ -44,11 +28,11 @@ describe('paperplane-bugsnag + bugsnag.notify', () => {
     )
 
     it('does not log', () =>
-      expect(logger.calls.length).to.equal(0)
+      expect(mockLogger.calls.length).to.equal(0)
     )
 
     it('does not notify', () =>
-      expect(notified.calls.length).to.equal(0)
+      expect(mockNotify.calls.length).to.equal(0)
     )
   })
 
@@ -60,12 +44,12 @@ describe('paperplane-bugsnag + bugsnag.notify', () => {
     )
 
     it('logs', () => {
-      expect(logger.calls.length).to.equal(1)
-      expect(logger.calls[0]).to.eql([ err ])
+      expect(mockLogger.calls.length).to.equal(1)
+      expect(mockLogger.calls[0]).to.eql([ err ])
     })
 
     it('does not notify', () =>
-      expect(notified.calls.length).to.equal(0)
+      expect(mockNotify.calls.length).to.equal(0)
     )
   })
 
@@ -77,12 +61,12 @@ describe('paperplane-bugsnag + bugsnag.notify', () => {
     )
 
     it('logs', () => {
-      expect(logger.calls.length).to.equal(1)
-      expect(logger.calls[0]).to.eql([ err ])
+      expect(mockLogger.calls.length).to.equal(1)
+      expect(mockLogger.calls[0]).to.eql([ err ])
     })
 
     it('notifies', () =>
-      expect(notified.calls.length).to.equal(1)
+      expect(mockNotify.calls.length).to.equal(1)
     )
   })
 
@@ -95,44 +79,44 @@ describe('paperplane-bugsnag + bugsnag.notify', () => {
     )
 
     it('logs', () => {
-      expect(logger.calls.length).to.equal(1)
-      expect(logger.calls[0]).to.eql([ err ])
+      expect(mockLogger.calls.length).to.equal(1)
+      expect(mockLogger.calls[0]).to.eql([ err ])
     })
 
     it('does not notify', () =>
-      expect(notified.calls.length).to.equal(0)
+      expect(mockNotify.calls.length).to.equal(0)
     )
   })
 
   describe('when used as cry for paperplane', () => {
     const err = Boom.badImplementation()
 
-    err.req = {
-      headers: {
-        authorization: 'Bearer abc123',
-        cookie: 'nom nom nom nom',
-        host: 'paperplane-bugsnag.zone'
-      },
-      method: 'GET',
-      pathname: '/api/users',
-      protocol: 'https',
-      query: { id: 'guy' },
-      url: '/api/users?id=guy'
-    }
-
-    beforeEach(() =>
+    beforeEach(() => {
+      err.req = {
+        headers: {
+          authorization: 'Bearer abc123',
+          cookie: 'nom nom nom nom',
+          host: 'paperplane-bugsnag.zone'
+        },
+        method: 'GET',
+        pathname: '/api/users',
+        protocol: 'https',
+        query: { id: 'guy' },
+        url: '/api/users?id=guy'
+      }
       bugsnag.notify(err)
-    )
+    })
 
     it('logs', () => {
-      expect(logger.calls.length).to.equal(1)
-      expect(logger.calls[0]).to.eql([ err ])
+      expect(mockLogger.calls.length).to.equal(1)
+      expect(mockLogger.calls[0]).to.eql([ err ])
     })
 
     it('includes the request data in the notification', () => {
-      expect(notified.calls.length).to.equal(1)
-      expect(notified.calls[0]).to.eql([{
-        events: [{
+      expect(mockNotify.calls.length).to.equal(1)
+      expect(mockNotify.calls[0]).to.deep.eql([
+        err,
+        {
           metaData: {
             request: {
               headers: {
@@ -146,8 +130,8 @@ describe('paperplane-bugsnag + bugsnag.notify', () => {
               url: 'https://paperplane-bugsnag.zone/api/users?id=guy'
             }
           }
-        }]
-      }])
+        }
+      ])
     })
   })
 })

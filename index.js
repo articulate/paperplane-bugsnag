@@ -1,13 +1,9 @@
 const { logger } = require('paperplane')
 
 const {
-  always, anyPass, complement, compose, evolve, flip, gt,
-  is, pathSatisfies, prop, tap, when
+  always, anyPass, complement, compose, evolve, gt,
+  is, mergeDeepRight, pathSatisfies, prop, tap, when
 } = require('ramda')
-
-const addRequest = (notification, { req }) => {
-  if (req) notification.events[0].metaData.request = formatRequest(req)
-}
 
 const clientError =
   pathSatisfies(gt(500), ['output', 'statusCode'])
@@ -24,7 +20,7 @@ const isJoi =
   prop('isJoi')
 
 const notifiable =
-  flip(complement(anyPass([ clientError, isJoi ])))
+  complement(anyPass([ clientError, isJoi ]))
 
 const redacted =
   always('REDACTED')
@@ -32,14 +28,24 @@ const redacted =
 const redactHeaders =
   evolve({ authorization: redacted, cookie: redacted })
 
-const setup = bugsnag => {
-  bugsnag.onBeforeNotify(notifiable)
-  bugsnag.onBeforeNotify(addRequest)
+const setup = bugsnagClient => {
+  const notify = (err, opts) => {
+    const { req } = err
 
-  bugsnag.notify =
-    when(is(Error), compose(bugsnag.notify, tap(logger)))
+    const metaData = {}
+    if (req) {
+      metaData.request = formatRequest(req)
+      delete err.req
+    }
 
-  return bugsnag
+    if (notifiable(err)) {
+      bugsnagClient.notify(err, mergeDeepRight(opts, { metaData }))
+    }
+  }
+
+  return {
+    notify: when(is(Error), compose(notify, tap(logger)))
+  }
 }
 
 module.exports = setup
