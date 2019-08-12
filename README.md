@@ -21,14 +21,13 @@ Setup your `bugsnag` like this:
 
 const bugsnag = require('bugsnag')
 
-bugsnag.register(process.env.BUGSNAG_API_KEY, {
-  releaseStage: process.env.SERVICE_ENV,
-  notifyReleaseStages: ['prod', 'stage']
+const bugsnagClient = bugsnag({
+  apiKey: process.env.BUGSNAG_API_KEY,
+  notifyReleaseStages: ['prod', 'stage'],
+  releaseStage: process.env.SERVICE_ENV
 })
 
-require('paperplane-bugsnag')(bugsnag)
-
-module.exports = bugsnag
+module.exports = require('paperplane-bugsnag')(bugsnagClient)
 ```
 
 Then use it as the `cry` option in `paperplane` like this:
