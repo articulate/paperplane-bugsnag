@@ -26,7 +26,7 @@ describe('logger', () => {
       bugsnag.notify(err)
     })
 
-    it('logs', () => {
+    it('logs with the paperlane logger', () => {
       expect(mockLogger.calls.length).to.equal(1)
       expect(mockLogger.calls[0]).to.eql([ err ])
     })
@@ -41,7 +41,7 @@ describe('logger', () => {
       bugsnag.notify(err)
     })
 
-    it('logs', () => {
+    it('logs with the custom logger', () => {
       expect(customLogger.calls.length).to.equal(1)
       expect(customLogger.calls[0]).to.eql([ err ])
     })
