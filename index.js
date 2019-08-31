@@ -1,4 +1,4 @@
-const { logger } = require('paperplane')
+const paperplane = require('paperplane')
 
 const {
   always, anyPass, complement, compose, evolve, gt,
@@ -28,7 +28,8 @@ const redacted =
 const redactHeaders =
   evolve({ authorization: redacted, cookie: redacted })
 
-const setup = bugsnagClient => {
+const setup = (bugsnagClient, logger = paperplane.logger) => {
+  console.log('hello')
   const notify = (err, opts) => {
     const { req } = err
 
