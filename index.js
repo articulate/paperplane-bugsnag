@@ -29,7 +29,6 @@ const redactHeaders =
   evolve({ authorization: redacted, cookie: redacted })
 
 const setup = (bugsnagClient, logger = paperplane.logger) => {
-  console.log('hello')
   const notify = (err, opts) => {
     const { req } = err
 
