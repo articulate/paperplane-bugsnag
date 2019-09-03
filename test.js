@@ -5,6 +5,49 @@ const spy = require('@articulate/spy')
 const mockLogger = require('paperplane').logger = spy()
 const setup = require('.')
 
+describe('logger', () => {
+  let bugsnag
+  const mockNotify = spy()
+
+  const mockBugsnagClient = {
+    notify: mockNotify,
+  }
+
+  afterEach(() => {
+    mockLogger.reset()
+    mockNotify.reset()
+  })
+
+  describe('without a custom logger', () => {
+    const err = Boom.notFound()
+
+    beforeEach(() => {
+      bugsnag = setup(mockBugsnagClient)
+      bugsnag.notify(err)
+    })
+
+    it('logs with the paperlane logger', () => {
+      expect(mockLogger.calls.length).to.equal(1)
+      expect(mockLogger.calls[0]).to.eql([ err ])
+    })
+  })
+
+  describe('with a custom logger', () => {
+    const err = Boom.notFound()
+    const customLogger = spy()
+
+    beforeEach(() => {
+      bugsnag = setup(mockBugsnagClient, customLogger)
+      bugsnag.notify(err)
+    })
+
+    it('logs with the custom logger', () => {
+      expect(customLogger.calls.length).to.equal(1)
+      expect(customLogger.calls[0]).to.eql([ err ])
+    })
+  })
+})
+
 describe('paperplane-bugsnag + bugsnag.notify', () => {
   let bugsnag
   const mockNotify = spy()
