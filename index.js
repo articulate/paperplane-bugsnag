@@ -1,8 +1,8 @@
 const paperplane = require('paperplane')
 
 const {
-  always, anyPass, complement, compose, evolve, gt,
-  is, mergeDeepRight, pathSatisfies, prop, tap, when
+  always, anyPass, complement, evolve, gt,
+  is, mergeDeepRight, pathSatisfies, prop,
 } = require('ramda')
 
 const clientError =
@@ -28,23 +28,29 @@ const redacted =
 const redactHeaders =
   evolve({ authorization: redacted, cookie: redacted })
 
+const isJsError = is(Error)
+
 const setup = (bugsnagClient, logger = paperplane.logger) => {
-  const notify = (err, opts) => {
-    const { req } = err
+  const notify = (err, opts = {}) => {
+    if (isJsError(err)) {
+      logger(err)
 
-    const metaData = {}
-    if (req) {
-      metaData.request = formatRequest(req)
-      delete err.req
-    }
+      const { req } = err
+      const metaData = {}
+      if (req) {
+        metaData.request = formatRequest(req)
+        delete err.req
+      }
 
-    if (notifiable(err)) {
-      bugsnagClient.notify(err, mergeDeepRight(opts, { metaData }))
+      if (notifiable(err)) {
+        const options = mergeDeepRight({ metaData, severity: 'error' }, opts)
+        bugsnagClient.notify(err, options)
+      }
     }
   }
 
   return {
-    notify: when(is(Error), compose(notify, tap(logger)))
+    notify,
   }
 }
 
