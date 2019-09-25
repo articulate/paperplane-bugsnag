@@ -179,7 +179,7 @@ describe('paperplane-bugsnag + bugsnag.notify', () => {
     })
   })
 
-  describe.only('when provided custom options', () => {
+  describe('when provided custom options', () => {
     const err = Boom.badImplementation()
     const options = {
       severity: 'info',
