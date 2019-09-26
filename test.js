@@ -172,8 +172,7 @@ describe('paperplane-bugsnag + bugsnag.notify', () => {
               query: { id: 'guy' },
               url: 'https://paperplane-bugsnag.zone/api/users?id=guy'
             }
-          },
-          severity: 'error'
+          }
         }
       ])
     })

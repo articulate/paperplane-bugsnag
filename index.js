@@ -43,7 +43,7 @@ const setup = (bugsnagClient, logger = paperplane.logger) => {
       }
 
       if (notifiable(err)) {
-        const options = mergeDeepRight({ metaData, severity: 'error' }, opts)
+        const options = mergeDeepRight({ metaData }, opts)
         bugsnagClient.notify(err, options)
       }
     }
