@@ -1,5 +1,5 @@
 {
-  "name": "paperplane-bugsnag",
+  "name": "@articulate/paperplane-bugsnag",
   "version": "0.2.1",
   "description": "A bugsnag wrapper for paperplane",
   "main": "index.js",
