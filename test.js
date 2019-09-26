@@ -177,4 +177,26 @@ describe('paperplane-bugsnag + bugsnag.notify', () => {
       ])
     })
   })
+
+  describe('when provided custom options', () => {
+    const err = Boom.badImplementation()
+    const options = {
+      severity: 'info',
+    }
+
+    beforeEach(() =>
+      bugsnag.notify(err, options)
+    )
+
+    it('uses them', () => {
+      expect(mockNotify.calls.length).to.equal(1)
+      expect(mockNotify.calls[0]).to.deep.eql([
+        err,
+        {
+          metaData: {},
+          severity: 'info'
+        }
+      ])
+    })
+  })
 })

@@ -27,7 +27,10 @@ const bugsnagClient = bugsnag({
   releaseStage: process.env.SERVICE_ENV
 })
 
-module.exports = require('paperplane-bugsnag')(bugsnagClient)
+const optionalCustomLogger =
+  err => console.error(`My custom logged error: ${err.message}`)
+
+module.exports = require('paperplane-bugsnag')(bugsnagClient, optionalCustomLogger)
 ```
 
 Then use it as the `cry` option in `paperplane` like this:
