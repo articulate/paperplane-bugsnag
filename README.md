@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  Filters `Boom` client errors (4xx) and `Joi` validation errors, and adds request data to the error notification for debugging.
+  Filters `Boom` client errors (4xx) and `Joi` validation errors by default, and adds request data to the error notification for debugging.
 </p>
 
 ## Usage
@@ -45,4 +45,25 @@ const app = require('./rest')
 const cry = require('./lib/bugsnag').notify
 
 http.createServer(mount({ app, cry })).listen(3000, cry)
+```
+
+By default, `Boom` client errors (4xx) and `Joi` validitation errors will be ignored.
+
+```js
+// server/rest.js
+module.exports = req => {
+  const err = Boom.badRequest()
+  return Promise.reject(err) // does not send notification
+}
+```
+
+We can force a notification by setting `cry=true` on the error.
+
+```js
+// server/rest.js
+module.exports = req => {
+  const err = Boom.badRequest()
+  err.cry = true
+  return Promise.reject(err) // sends notification
+}
 ```

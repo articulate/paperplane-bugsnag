@@ -96,6 +96,23 @@ describe('paperplane-bugsnag + bugsnag.notify', () => {
     )
   })
 
+  describe('when Booms with client error (4xx) with cry', () => {
+    const err = Object.assign(Boom.notFound(), { cry: true })
+
+    beforeEach(() =>
+      bugsnag.notify(err)
+    )
+
+    it('logs', () => {
+      expect(mockLogger.calls.length).to.equal(1)
+      expect(mockLogger.calls[0]).to.eql([ err ])
+    })
+
+    it('does not notify', () =>
+      expect(mockNotify.calls.length).to.equal(1)
+    )
+  })
+
   describe('when Booms with server error (5xx)', () => {
     const err = Boom.badImplementation()
 
@@ -128,6 +145,25 @@ describe('paperplane-bugsnag + bugsnag.notify', () => {
 
     it('does not notify', () =>
       expect(mockNotify.calls.length).to.equal(0)
+    )
+  })
+
+  describe('when Joi error with cry', () => {
+    const err = new Error('joi boi')
+    err.cry = true
+    err.isJoi = true
+
+    beforeEach(() =>
+      bugsnag.notify(err)
+    )
+
+    it('logs', () => {
+      expect(mockLogger.calls.length).to.equal(1)
+      expect(mockLogger.calls[0]).to.eql([ err ])
+    })
+
+    it('does not notify', () =>
+      expect(mockNotify.calls.length).to.equal(1)
     )
   })
 

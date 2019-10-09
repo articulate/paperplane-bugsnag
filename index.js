@@ -1,7 +1,7 @@
 const paperplane = require('paperplane')
 
 const {
-  always, anyPass, complement, evolve, gt,
+  always, anyPass, complement, either, evolve, gt,
   is, mergeDeepRight, pathSatisfies, prop,
 } = require('ramda')
 
@@ -20,7 +20,10 @@ const isJoi =
   prop('isJoi')
 
 const notifiable =
-  complement(anyPass([ clientError, isJoi ]))
+  either(
+    prop('cry'),
+    complement(anyPass([ clientError, isJoi ]))
+  )
 
 const redacted =
   always('REDACTED')
