@@ -108,7 +108,7 @@ describe('paperplane-bugsnag + bugsnag.notify', () => {
       expect(mockLogger.calls[0]).to.eql([ err ])
     })
 
-    it('does not notify', () =>
+    it('notifies', () =>
       expect(mockNotify.calls.length).to.equal(1)
     )
   })
@@ -162,7 +162,7 @@ describe('paperplane-bugsnag + bugsnag.notify', () => {
       expect(mockLogger.calls[0]).to.eql([ err ])
     })
 
-    it('does not notify', () =>
+    it('notifies', () =>
       expect(mockNotify.calls.length).to.equal(1)
     )
   })
